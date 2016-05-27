@@ -54,60 +54,36 @@ def get_drop_out(name):
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                 else:
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
             else:
                 if key_1[2] not in tmp[key_1[0]][key_1[1]]:
                     tmp[key_1[0]][key_1[1]][key_1[2]] = {}
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                 else:
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
         elif key_1[0] != 'Constant':
             if key_1[1] not in tmp[key_1[0]]:
                 tmp[key_1[0]][key_1[1]] = {}
@@ -116,59 +92,65 @@ def get_drop_out(name):
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                 else:
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
             else:
                 if key_1[2] not in tmp[key_1[0]][key_1[1]]:
                     tmp[key_1[0]][key_1[1]][key_1[2]] = {}
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                 else:
                     if i[1] not in tmp[key_1[0]][key_1[1]][key_1[2]]:
                         tmp[key_1[0]][key_1[1]][key_1[2]][i[1]] = {}
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
                     else:
                         for j in range(2, len(head)):
-                            if head[j] not in tmp[key_1[0]][key_1[1]][key_1[2]][i[1]]:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
-                            else:
-                                tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
+                            tmp[key_1[0]][key_1[1]][key_1[2]][i[1]][head[j]] = i[j]
     return tmp
-    
+
+def get_allele_freq(name):
+    tmp = {}
+    data = read_csv(name)
+    head = data[0]
+    for i in data:
+        if i[0] not in tmp and i[0] != 'Locus':
+            tmp[i[0]] = {}
+            if i[1] not in tmp[i[0]]:
+                tmp[i[0]][i[1]] = {}
+                for j in range(2, len(head)):
+                    tmp[i[0]][i[1]][head[j]] = i[j]
+            else:
+                for j in range(2, len(head)):
+                    tmp[i[0]][i[1]][head[j]] = i[j]
+        elif i[0] != 'Locus':
+            if i[1] not in tmp[i[0]]:
+                tmp[i[0]][i[1]] = {}
+                for j in range(2, len(head)):
+                    tmp[i[0]][i[1]][head[j]] = i[j]
+            else:
+                for j in range(2, len(head)):
+                    tmp[i[0]][i[1]][head[j]] = i[j]
+    return tmp
+
+def get_drop_in(name):
+    tmp = {}
+    data = read_csv(name)
+    for i in data:
+        tmp[i[0]] = i[1]
+    return tmp

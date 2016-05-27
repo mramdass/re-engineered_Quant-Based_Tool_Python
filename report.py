@@ -1,7 +1,5 @@
 from genotype_combinations import Allele, Genotypes, Person
-from get_data import Constants, get_drop_out
-
-FREQ_CORRECTION = 0.005 # In the event the wild frequency goes below 0
+from get_data import Constants, get_drop_out, get_drop_in, get_allele_freq
 
 class Report:
     def __init__(self, drop_out_db, knowns_pn, unknowns_pn, knowns_pd, unknowns_pd, genotypes, replicates, case_name, locus, constants):
@@ -350,21 +348,25 @@ class Report:
                         self.constants.PD_PHET2 = PHET2
                         self.constants.PD_PHET0 = full - (self.constants.PD_PHET1 + PHET2)
 
-def generate_wild_allele_freq(alleles):
+def generate_wild_allele_freq(alleles, constants):
     c = float(1.0)
     for i in len(alleles):
         c -= alleles[i].freq
     if c < 0:
-        c = FREQ_CORRECTION
+        return constants.MINIMUM_WILD_FREQUENCY
     return c
 
 '''
 for i in name_files():
     if i.startswith('Evidence_'):
         numbers = read(i)
-
-import json
-with open('o.json', 'w') as o:
-    o.write(json.dumps(get_drop_out('Drop_Out_Rates.csv'), indent=4))
 '''
+import json
+with open('odb.json', 'w') as o:
+    o.write(json.dumps(get_drop_out('Drop_Out_Rates.csv'), indent=4))
 
+with open('adb.json', 'w') as o:
+    o.write(json.dumps(get_allele_freq('Allele_Frequencies.csv'), indent=4))
+
+with open('idb.json', 'w') as o:
+    o.write(json.dumps(get_drop_in('Drop_In_Rates.csv'), indent=4))
