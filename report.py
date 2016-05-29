@@ -32,19 +32,18 @@ class Report:
 
         self.persons = []
         self.generate_persons()
-
         self.population_pn = [[None] * (len(self.knowns_pn) + self.unknowns_pn)] * (len(self.genotypes.allele_comb) ** (len(self.knowns_pn) + self.unknowns_pn))
         self.population_pd = [[None] * (len(self.knowns_pd) + self.unknowns_pd)] * (len(self.genotypes.allele_comb) ** (len(self.knowns_pd) + self.unknowns_pd))
         self.generate_populations()
         
         wild_vector = []
-        if persons[0].a.length == -1 and person[0].b.length == -1:
+        if self.persons[0].a.length == -1 and self.person[0].b.length == -1:
             del population_pn[:]
             for i in range(0, knowns_pn.size() + unknowns_pn):
                 wild_vector.append(persons[0])
             self.population_pn.append(wild_vector)
             del wild_vector[:]
-        if persons[0].a.length == -1 and person[0].b.length == -1:
+        if self.persons[0].a.length == -1 and self.person[0].b.length == -1:
             del population_pd[:]
             for i in range(0, knowns_pd.size() + unknowns_pd):
                 wild_vector.append(persons[0])
@@ -53,8 +52,8 @@ class Report:
 
         self.check_person()
         
-        self.pn = generate_px(drop_out_db, "PN")
-        self.pd = generate_px(drop_out_db, "PD")
+        self.pn = self.generate_px(drop_out_db, "PN")
+        self.pd = self.generate_px(drop_out_db, "PD")
         self.lr = self.pn / self.pd
 
     def permute(self, number_items, length, position, depth, perimeter, ID):
@@ -97,10 +96,10 @@ class Report:
             found_a = False
             found_b = False
             for j in range(0, len(self.replicates)):
-                for k in range(0, len(self.replicates[i])):
-                    if self.knowns_pn[i] == self.replicates[j][k]:
+                for k in range(0, len(self.replicates[j])):
+                    if self.knowns_pn[i].a == self.replicates[j][k]:
                         found_a = True
-                    if self.knowns_pn[i] == self.replicates[j][k]:
+                    if self.knowns_pn[i].b == self.replicates[j][k]:
                         found_b = True
             if found_a and fonud_b:
                 self.knowns_pn[i].b = self.persons[len(self.persons) - 1].b
@@ -114,20 +113,20 @@ class Report:
                 self.knowns_pn[i].a = self.persons[len(self.persons) - 1].a
                 self.knowns_pn[i].generate_freq()
             if self.knowns_pn[i].a.is_equal(self.knowns_pn[i].b):
-                self.known_pn[i].hom = True
-                self.known_pn[i].het = False
+                self.knowns_pn[i].hom = True
+                self.knowns_pn[i].het = False
             else:
-                self.known_pn[i].hom = False
-                self.known_pn[i].het = True
+                self.knowns_pn[i].hom = False
+                self.knowns_pn[i].het = True
         for i in range(0, len(self.knowns_pd)):
             found_two = False
             found_a = False
             found_b = False
             for j in range(0, len(self.replicates)):
-                for k in range(0, len(self.replicates[i])):
-                    if self.knowns_pd[i] == self.replicates[j][k]:
+                for k in range(0, len(self.replicates[j])):
+                    if self.knowns_pd[i].a == self.replicates[j][k]:
                         found_a = True
-                    if self.knowns_pd[i] == self.replicates[j][k]:
+                    if self.knowns_pd[i].b == self.replicates[j][k]:
                         found_b = True
             if found_a and fonud_b:
                 self.knowns_pd[i].b = self.persons[len(self.persons) - 1].b
@@ -141,22 +140,27 @@ class Report:
                 self.knowns_pd[i].a = self.persons[len(self.persons) - 1].a
                 self.knowns_pd[i].generate_freq()
             if self.knowns_pd[i].a.is_equal(self.knowns_pd[i].b):
-                self.known_pd[i].hom = True
-                self.known_pd[i].het = False
+                self.knowns_pd[i].hom = True
+                self.knowns_pd[i].het = False
             else:
-                self.known_pd[i].hom = False
-                self.known_pd[i].het = True
+                self.knowns_pd[i].hom = False
+                self.knowns_pd[i].het = True
 
     def generate_populations(self):
         for i in range(0, len(self.indicies_pn)):
             for j in range(0, len(self.indicies_pn[i])):
-                self.population_pn[i][j] = Person(self.genotypes.allele_comb[self.indicies_pn[i][j]].first, self.genotypes.allele_comb[self.indicies_pn[i][j]].second)
+                self.population_pn[i][j] = Person(self.genotypes.allele_comb[self.indicies_pn[i][j]][0], self.genotypes.allele_comb[self.indicies_pn[i][j]][1])
         for i in range(0, len(self.indicies_pd)):
             for j in range(0, len(self.indicies_pd[i])):
-                self.population_pd[i][j] = Person(self.genotypes.allele_comb[self.indicies_pd[i][j]].first, self.genotypes.allele_comb[self.indicies_pd[i][j]].second)
+                self.population_pd[i][j] = Person(self.genotypes.allele_comb[self.indicies_pd[i][j]][0], self.genotypes.allele_comb[self.indicies_pd[i][j]][1])
 
     def generate_px(self, db, ID):
-        self.set_drop_out(db, CONTRIBUTORS_PN, ID)       # TO DO
+        if ID == "PN":
+            self.set_drop_out(db, self.constants.CONTRIBUTORS_PN, ID)
+        elif ID == "PD":
+            self.set_drop_out(db, self.constants.CONTRIBUTORS_PD, ID)
+        else:
+            print "class Report (generate_px) ID is incorrectly inputted"
         product = float(1.0)
         summation = float(0.0)
         if ID == "PN":
@@ -190,17 +194,16 @@ class Report:
         else:
             print "class Report (generate_px) ID is incorrectly inputted"
 
-    def is_subset_px(self, i, ID):
+    def is_subset_px(self, i, ID): # CREATE PERSON EQUALITY CHECKER
         if ID == "PN":
             if self.population_pn[i][:len(self.knowns_pn)] in self.knowns_pn:
                 return True
-            return False
         elif ID == "PD":
             if self.population_pd[i][:len(self.knowns_pd)] in self.knowns_pd:
                 return True
-            return False
         else:
             print "class Report (is_subset_px) ID is incorrectly inputted"
+        return False
 
     def drop_out(self, person, alleles, ID):
         if ID == "PN":
@@ -267,27 +270,32 @@ class Report:
         else:
             return self.constants.PC2
 
-    def set_drop_out(self, db, contributors, ID):
+    def set_drop_out(self, db, num_contributors, ID):
+        contributors = str(num_contributors)
         rates = []  # ['HET1', 'HET2', 'HOM1']
         for i in db:
             rates.append(i)
-        rates = rates.sort()    # need HET1, then HET2
-        quants = []
-        for i in db['HET1'][1]['D']:
+        rates.sort()    # need HET1, then HET2
+        quants = ['6.25', '12.5', '25', '50', '100', '150', '250', '500']
+        '''
+        for i in db['HET1']['1']['D']['FGA']:
             quants.append(i)
-        quants = quants.sort()
-        l = float(0.0)
-        h = float(0.0)
+        quants = [float(i) for i in quants]
+        quants.sort()
+        quants = [str(i) for i in quants]
+        '''
+        l = '25'
+        h = '50'
         for i in range(0, len(quants)):
-            if quants[i] < self.constants.QUANT and quants[i + 1] > self.constants.QUANT:
+            if float(quants[i]) < self.constants.QUANT and float(quants[i + 1]) > self.constants.QUANT:
                 l = quants[i]       # lower quant milepost
                 h = quants[i + 1]   # higher quant milepost
         full = float(1.0)
         for i in rates:
             if i == 'HOM1' and self.constants.DEDUCIBLE:
                 b = float(0.0)  # y-intercept or value for constant
-                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (h - 1)
-                b = db[i][contributors]['D'][self.locus][l] - (slope * l)
+                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(1))
+                b = db[i][contributors]['D'][self.locus][l] - (slope * float(l))
                 PHOM1 = slope * self.constants.QUANT + b
                 PHOM0 = full - PHOM1
                 if ID == "PN":
@@ -298,8 +306,8 @@ class Report:
                     self.constants.PD_PHOM0 = PHOM0
             elif i == 'HET1' and self.constants.DEDUCIBLE:
                 b = float(0.0)
-                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (h - 1)
-                b = db[i][contributors]['D'][self.locus][l] - (slope * l)
+                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(1))
+                b = db[i][contributors]['D'][self.locus][l] - (slope * float(l))
                 PHET1 = slope * self.constants.QUANT + b
                 if ID == "PN":
                     self.constants.PN_PHET1 = PHET1
@@ -307,8 +315,8 @@ class Report:
                     self.constants.PD_PHET1 = PHET1
             elif i == 'HET2' and self.constants.DEDUCIBLE:
                 b = float(0.0)
-                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (h - 1)
-                b = db[i][contributors]['D'][self.locus][l] - (slope * l)
+                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(1))
+                b = db[i][contributors]['D'][self.locus][l] - (slope * float(l))
                 PHET2 = slope * self.constants.QUANT + b
                 if ID == "PN":
                     self.constants.PN_PHET2 = PHET2
@@ -318,8 +326,8 @@ class Report:
                     self.constants.PD_PHET0 = full - (self.constants.PD_PHET1 + PHET2)
             elif i == 'HOM1' and not self.constants.DEDUCIBLE:
                 b = float(0.0)  # y-intercept or value for constant
-                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (h - 1)
-                b = db[i][contributors]['ND'][self.locus][l] - (slope * l)
+                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(1))
+                b = db[i][contributors]['ND'][self.locus][l] - (slope * float(l))
                 PHOM1 = slope * self.constants.QUANT + b
                 PHOM0 = full - PHOM1
                 if ID == "PN":
@@ -330,8 +338,8 @@ class Report:
                     self.constants.PD_PHOM0 = PHOM0
             elif i == 'HET1' and not self.constants.DEDUCIBLE:
                 b = float(0.0)
-                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (h - 1)
-                b = db[i][contributors]['ND'][self.locus][l] - (slope * l)
+                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(1))
+                b = db[i][contributors]['ND'][self.locus][l] - (slope * float(l))
                 PHET1 = slope * self.constants.QUANT + b
                 if ID == "PN":
                     self.constants.PN_PHET1 = PHET1
@@ -339,8 +347,8 @@ class Report:
                     self.constants.PD_PHET1 = PHET1
             elif i == 'HET2' and not self.constants.DEDUCIBLE:
                 b = float(0.0)
-                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (h - 1)
-                b = db[i][contributors]['ND'][self.locus][l] - (slope * l)
+                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(1))
+                b = db[i][contributors]['ND'][self.locus][l] - (slope * float(l))
                 PHET2 = slope * self.constants.QUANT + b
                 if ID == "PN":
                     self.constants.PN_PHET2 = PHET2
@@ -389,21 +397,21 @@ def gather():
         num_knowns_pd = 0
         num_unknowns_pn = 0
         num_unknowns_pd = 0
+        if 'Unknowns Pn' in cdb[case]['FGA']:
+            num_unknowns_pn = int(cdb[case]['FGA']['Unknowns Pn'])
         if 'Unknowns Pn' in cdb[case]:
-            num_unknowns_pn = int(cdb[case]['Unknowns Pn'])
-        if 'Unknowns Pn' in cdb[case]:
-            num_unknowns_pd = int(cdb[case]['Unknowns Pd'])
-        if 'Known Pn 1' in cdb[case]:
+            num_unknowns_pd = int(cdb[case]['FGA']['Unknowns Pd'])
+        if 'Known Pn 1' in cdb[case]['FGA']:
             num_knowns_pn += 1
-        if 'Known Pn 2' in cdb[case]:
+        if 'Known Pn 2' in cdb[case]['FGA']:
             num_knowns_pn += 1
-        if 'Known Pn 3' in cdb[case]:
+        if 'Known Pn 3' in cdb[case]['FGA']:
             num_knowns_pn += 1
-        if 'Known Pd 1' in cdb[case]:
+        if 'Known Pd 1' in cdb[case]['FGA']:
             num_knowns_pd += 1
-        if 'Known Pd 2' in cdb[case]:
+        if 'Known Pd 2' in cdb[case]['FGA']:
             num_knowns_pd += 1
-        if 'Known Pd 3' in cdb[case]:
+        if 'Known Pd 3' in cdb[case]['FGA']:
             num_knowns_pd += 1
         if 'Unknowns Pn' in cdb[case]:
             constants.CONTRIBUTORS_PN = num_knowns_pn + num_unknowns_pn
@@ -412,6 +420,8 @@ def gather():
         if 'Contributors' in cdb[case]:
             constants.CONTRIBUTORS_PN = int(cdb[case]['Contributors'])
             constants.CONTRIBUTORS_PD = int(cdb[case]['Contributors'])
+            num_unknowns_pn = constants.CONTRIBUTORS_PN - num_knowns_pn
+            num_unknowns_pd = constants.CONTRIBUTORS_PD - num_knowns_pd
         constants.QUANT = float(cdb[case]['Quant'])
         if constants.QUANT > 500:
             constants.QUANT = 500
