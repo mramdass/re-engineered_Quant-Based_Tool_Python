@@ -1,4 +1,4 @@
-TETHA = 0.3
+THETA = 0.03
 class Allele:
     def __init__(self, locus = "W", length = -1, freq = 1):
         self.locus = locus
@@ -32,7 +32,7 @@ class Genotypes:
         return tmp
 
     def calc_hom(self, a):
-        return a.freq * a.freq + a.freq * TETHA * (1 - a.freq)
+        return a.freq * a.freq + a.freq * THETA * (1 - a.freq)
 
     def calc_het(self, a, b):
         return 2 * a.freq * b.freq
@@ -60,7 +60,7 @@ class Person:
         return tmp
 
     def calc_hom(self, a):
-        return a.freq * a.freq + a.freq * TETHA * (1 - a.freq)
+        return a.freq * a.freq + a.freq * THETA * (1 - a.freq)
 
     def calc_het(self, a, b):
         return 2 * a.freq * b.freq

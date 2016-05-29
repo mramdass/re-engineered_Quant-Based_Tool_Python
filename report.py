@@ -1,5 +1,6 @@
-from genotype_combinations import Allele, Genotypes, Person
+from genotype_combinations import Allele, Genotypes, Person, THETA
 from get_data import LOCUS, RACE, Constants, get_drop_out, get_drop_in, get_allele_freq, get_mixture
+from copy import copy, deepcopy
 
 class Report:
     def __init__(self, drop_out_db, knowns_pn, unknowns_pn, knowns_pd, unknowns_pd, genotypes, replicates, case_name, locus, constants):
@@ -29,13 +30,24 @@ class Report:
             self.permute_driver(tmp, unknowns_pd + len(knowns_pd), "PD")
         else:
             self.indicies_pd.append(tmp)
-
+        
         self.persons = []
         self.generate_persons()
         self.population_pn = [[None] * (len(self.knowns_pn) + self.unknowns_pn)] * (len(self.genotypes.allele_comb) ** (len(self.knowns_pn) + self.unknowns_pn))
         self.population_pd = [[None] * (len(self.knowns_pd) + self.unknowns_pd)] * (len(self.genotypes.allele_comb) ** (len(self.knowns_pd) + self.unknowns_pd))
         self.generate_populations()
         
+        with open('pn.json', 'w') as o:
+            for i in self.population_pn:
+                for j in i:
+                    o.write('(' + str(j.a.length) + str(j.b.length) + ') ')
+                o.write('\n')
+        with open('pd.json', 'w') as o:
+            for i in self.population_pd:
+                for j in i:
+                    o.write('(' + str(j.a.length) + str(j.b.length) + ') ')
+                o.write('\n')
+        input()
         wild_vector = []
         if self.persons[0].a.length == -1 and self.person[0].b.length == -1:
             del population_pn[:]
@@ -55,6 +67,7 @@ class Report:
         self.pn = self.generate_px(drop_out_db, "PN")
         self.pd = self.generate_px(drop_out_db, "PD")
         self.lr = self.pn / self.pd
+        print self.lr, self.pn, self.pd
 
     def permute(self, number_items, length, position, depth, perimeter, ID):
         if depth >= length:
@@ -146,12 +159,18 @@ class Report:
                 self.knowns_pd[i].hom = False
                 self.knowns_pd[i].het = True
 
-    def generate_populations(self):
+    def generate_populations(self): # SOMETHING IS GOING OUT OF SCOPE HERE
         for i in range(0, len(self.indicies_pn)):
             for j in range(0, len(self.indicies_pn[i])):
                 self.population_pn[i][j] = Person(self.genotypes.allele_comb[self.indicies_pn[i][j]][0], self.genotypes.allele_comb[self.indicies_pn[i][j]][1])
+                #print self.population_pn[i][j].a.length, self.population_pn[i][j].b.length
+        for i in range(0, len(self.population_pn)): # DEBUG LOOP
+            for j in range(0, len(self.population_pn[i])):
+                print self.population_pn[i][j].a.length, self.population_pn[i][j].b.length, ' ',
+            print '\n'
         for i in range(0, len(self.indicies_pd)):
             for j in range(0, len(self.indicies_pd[i])):
+                #print self.genotypes.allele_comb[self.indicies_pd[i][j]][0].length, self.genotypes.allele_comb[self.indicies_pd[i][j]][1].length
                 self.population_pd[i][j] = Person(self.genotypes.allele_comb[self.indicies_pd[i][j]][0], self.genotypes.allele_comb[self.indicies_pd[i][j]][1])
 
     def generate_px(self, db, ID):
@@ -167,12 +186,12 @@ class Report:
             for i in range(0, len(self.population_pn)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pn[i])):
-                        if j >= (self.unknowns_pn + len(knowns_pn)) - ((self.unknowns_pn + len(self.knowns_pn)) - len(self.knowns_pn)):
+                        if j >= (self.unknowns_pn + len(self.knowns_pn)) - ((self.unknowns_pn + len(self.knowns_pn)) - len(self.knowns_pn)):
                             product *= self.population_pn[i][j].freq
                     for j in range(0, len(self.population_pn[i])):
                         for k in range(0, len(self.replicates)):
                             product *= self.drop_out(self.population_pn[i][j], self.replicates[k], ID)
-                    for j in range(0, len(replicates)):
+                    for j in range(0, len(self.replicates)):
                         product *= self.drop_in(self.population_pn[i], self.replicates[j])
                     summation += product
                     product = float(1.0)
@@ -181,12 +200,12 @@ class Report:
             for i in range(0, len(self.population_pd)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pd[i])):
-                        if j >= (self.unknowns_pd + len(knowns_pd)) - ((self.unknowns_pd + len(self.knowns_pd)) - len(self.knowns_pd)):
+                        if j >= (self.unknowns_pd + len(self.knowns_pd)) - ((self.unknowns_pd + len(self.knowns_pd)) - len(self.knowns_pd)):
                             product *= self.population_pd[i][j].freq
                     for j in range(0, len(self.population_pd[i])):
                         for k in range(0, len(self.replicates)):
                             product *= self.drop_out(self.population_pd[i][j], self.replicates[k], ID)
-                    for j in range(0, len(replicates)):
+                    for j in range(0, len(self.replicates)):
                         product *= self.drop_in(self.population_pd[i], self.replicates[j])
                     summation += product
                     product = float(1.0)
@@ -196,19 +215,25 @@ class Report:
 
     def is_subset_px(self, i, ID): # CREATE PERSON EQUALITY CHECKER
         if ID == "PN":
-            if self.population_pn[i][:len(self.knowns_pn)] in self.knowns_pn:
+            if self.subset(self.population_pn[i][:len(self.knowns_pn)], self.knowns_pn):
                 return True
         elif ID == "PD":
-            if self.population_pd[i][:len(self.knowns_pd)] in self.knowns_pd:
+            if self.subset(self.population_pd[i][:len(self.knowns_pd)], self.knowns_pd):
                 return True
         else:
             print "class Report (is_subset_px) ID is incorrectly inputted"
         return False
 
+    def subset(self, persons_1, persons_2):
+        for i in range(0, len(persons_1)):
+            if not persons_1[i].is_equal(persons_2[i]):
+                return False
+        return True
+
     def drop_out(self, person, alleles, ID):
         if ID == "PN":
             if person.hom:
-                for i in range(0, alleles):
+                for i in range(0, len(alleles)):
                     if person.a == alleles[i] and person.b == alleles[i]:
                         return self.constants.PN_PHOM0
                 return self.constants.PN_PHOM1
@@ -230,7 +255,7 @@ class Report:
                     "class Report (drop_out) present conditions not met"
         elif ID == "PD":
             if person.hom:
-                for i in range(0, alleles):
+                for i in range(0, len(alleles)):
                     if person.a == alleles[i] and person.b == alleles[i]:
                         return self.constants.PD_PHOM0
                 return self.constants.PD_PHOM1
@@ -393,6 +418,8 @@ def gather():
     cdb = get_mixture('case.csv')
     for case in cdb:
         constants = Constants()
+        THETA = idb['THETA']
+        constants.THETHA = THETA # Redundant
         num_knowns_pn = 0
         num_knowns_pd = 0
         num_unknowns_pn = 0
