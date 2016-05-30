@@ -33,21 +33,10 @@ class Report:
         
         self.persons = []
         self.generate_persons()
-        self.population_pn = [[None] * (len(self.knowns_pn) + self.unknowns_pn)] * (len(self.genotypes.allele_comb) ** (len(self.knowns_pn) + self.unknowns_pn))
-        self.population_pd = [[None] * (len(self.knowns_pd) + self.unknowns_pd)] * (len(self.genotypes.allele_comb) ** (len(self.knowns_pd) + self.unknowns_pd))
+        self.population_pn = [[None for i in xrange(len(self.knowns_pn) + self.unknowns_pn)] for i in xrange(len(self.genotypes.allele_comb) ** (len(self.knowns_pn) + self.unknowns_pn))]
+        self.population_pd = [[None for i in xrange(len(self.knowns_pd) + self.unknowns_pd)] for i in xrange(len(self.genotypes.allele_comb) ** (len(self.knowns_pd) + self.unknowns_pd))]
         self.generate_populations()
         
-        with open('pn.json', 'w') as o:
-            for i in self.population_pn:
-                for j in i:
-                    o.write('(' + str(j.a.length) + str(j.b.length) + ') ')
-                o.write('\n')
-        with open('pd.json', 'w') as o:
-            for i in self.population_pd:
-                for j in i:
-                    o.write('(' + str(j.a.length) + str(j.b.length) + ') ')
-                o.write('\n')
-        input()
         wild_vector = []
         if self.persons[0].a.length == -1 and self.person[0].b.length == -1:
             del population_pn[:]
@@ -63,7 +52,8 @@ class Report:
             del wild_vector[:]
 
         self.check_person()
-        
+        for i in self.knowns_pn:
+            print i.a.length, ',', i.b.length
         self.pn = self.generate_px(drop_out_db, "PN")
         self.pd = self.generate_px(drop_out_db, "PD")
         self.lr = self.pn / self.pd
@@ -110,11 +100,11 @@ class Report:
             found_b = False
             for j in range(0, len(self.replicates)):
                 for k in range(0, len(self.replicates[j])):
-                    if self.knowns_pn[i].a == self.replicates[j][k]:
+                    if self.knowns_pn[i].a.length == self.replicates[j][k]:
                         found_a = True
-                    if self.knowns_pn[i].b == self.replicates[j][k]:
+                    if self.knowns_pn[i].b.length == self.replicates[j][k]:
                         found_b = True
-            if found_a and fonud_b:
+            if found_a and not found_b:
                 self.knowns_pn[i].b = self.persons[len(self.persons) - 1].b
                 self.knowns_pn[i].generate_freq()
             if not found_a and found_b:
@@ -141,7 +131,7 @@ class Report:
                         found_a = True
                     if self.knowns_pd[i].b == self.replicates[j][k]:
                         found_b = True
-            if found_a and fonud_b:
+            if found_a and not fonud_b:
                 self.knowns_pd[i].b = self.persons[len(self.persons) - 1].b
                 self.knowns_pd[i].generate_freq()
             if not found_a and found_b:
@@ -159,18 +149,12 @@ class Report:
                 self.knowns_pd[i].hom = False
                 self.knowns_pd[i].het = True
 
-    def generate_populations(self): # SOMETHING IS GOING OUT OF SCOPE HERE
+    def generate_populations(self):
         for i in range(0, len(self.indicies_pn)):
             for j in range(0, len(self.indicies_pn[i])):
                 self.population_pn[i][j] = Person(self.genotypes.allele_comb[self.indicies_pn[i][j]][0], self.genotypes.allele_comb[self.indicies_pn[i][j]][1])
-                #print self.population_pn[i][j].a.length, self.population_pn[i][j].b.length
-        for i in range(0, len(self.population_pn)): # DEBUG LOOP
-            for j in range(0, len(self.population_pn[i])):
-                print self.population_pn[i][j].a.length, self.population_pn[i][j].b.length, ' ',
-            print '\n'
         for i in range(0, len(self.indicies_pd)):
             for j in range(0, len(self.indicies_pd[i])):
-                #print self.genotypes.allele_comb[self.indicies_pd[i][j]][0].length, self.genotypes.allele_comb[self.indicies_pd[i][j]][1].length
                 self.population_pd[i][j] = Person(self.genotypes.allele_comb[self.indicies_pd[i][j]][0], self.genotypes.allele_comb[self.indicies_pd[i][j]][1])
 
     def generate_px(self, db, ID):
@@ -182,38 +166,53 @@ class Report:
             print "class Report (generate_px) ID is incorrectly inputted"
         product = float(1.0)
         summation = float(0.0)
+        
         if ID == "PN":
+            pno = open('output/PN_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
             for i in range(0, len(self.population_pn)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pn[i])):
                         if j >= (self.unknowns_pn + len(self.knowns_pn)) - ((self.unknowns_pn + len(self.knowns_pn)) - len(self.knowns_pn)):
                             product *= self.population_pn[i][j].freq
+                            pno.write(str(self.population_pn[i][j].freq) + ',') #
                     for j in range(0, len(self.population_pn[i])):
                         for k in range(0, len(self.replicates)):
                             product *= self.drop_out(self.population_pn[i][j], self.replicates[k], ID)
+                            pno.write(str(self.drop_out(self.population_pn[i][j], self.replicates[k], ID)) + ',') #
                     for j in range(0, len(self.replicates)):
                         product *= self.drop_in(self.population_pn[i], self.replicates[j])
+                        pno.write(str(self.drop_in(self.population_pn[i], self.replicates[j])) + ',') #
                     summation += product
+                    pno.write(',' + str(summation) + '\n') #
                     product = float(1.0)
+
+            pno.close()
             return summation
         elif ID == "PD":
+            pdo = open('output/PD_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
             for i in range(0, len(self.population_pd)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pd[i])):
                         if j >= (self.unknowns_pd + len(self.knowns_pd)) - ((self.unknowns_pd + len(self.knowns_pd)) - len(self.knowns_pd)):
                             product *= self.population_pd[i][j].freq
+                            pdo.write(str(self.population_pd[i][j].freq) + ',') #
                     for j in range(0, len(self.population_pd[i])):
                         for k in range(0, len(self.replicates)):
                             product *= self.drop_out(self.population_pd[i][j], self.replicates[k], ID)
+                            pdo.write(str(self.drop_out(self.population_pd[i][j], self.replicates[k], ID)) + ',') #
                     for j in range(0, len(self.replicates)):
                         product *= self.drop_in(self.population_pd[i], self.replicates[j])
+                        pdo.write(str(self.drop_in(self.population_pd[i], self.replicates[j])) + ',') #
                     summation += product
+                    pdo.write(',' + str(summation) + '\n') #
                     product = float(1.0)
+            
+            pdo.close()
             return summation
         else:
             print "class Report (generate_px) ID is incorrectly inputted"
 
-    def is_subset_px(self, i, ID): # CREATE PERSON EQUALITY CHECKER
+    def is_subset_px(self, i, ID):
         if ID == "PN":
             if self.subset(self.population_pn[i][:len(self.knowns_pn)], self.knowns_pn):
                 return True
@@ -240,7 +239,7 @@ class Report:
             elif person.het:
                 present_first = False
                 present_second = False
-                for i in range(0, alleles):
+                for i in range(0, len(alleles)):
                     if person.a == alleles[i]:
                         present_first = True
                     if person.b == alleles[i]:
@@ -262,7 +261,7 @@ class Report:
             elif person.het:
                 present_first = False
                 present_second = False
-                for i in range(0, alleles):
+                for i in range(0, len(alleles)):
                     if person.a == alleles[i]:
                         present_first = True
                     if person.b == alleles[i]:
