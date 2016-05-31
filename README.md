@@ -34,7 +34,7 @@ Contributors is an integer ranging from 1 to 3 inclusively
 Deducible is a string value of either "D" or "ND"  
 Quant is a float value ranging from 6.25 to 500 (any other values will be adjusted to the minimum or maximum quant for that mixture  
 Known and Replicate columns, float values representing allele lengths must be semicolom delimited  
-Here is the John Bulter CSV Formation done three ways (the first is ideal, while the other two are for experimental purposes):
+Here is the John Bulter CSV example done three ways (the first is ideal, while the other two are for experimental purposes):
 
 ```
 Case Name,Locus,Contributors,Deducible,Quant,Known Pn 1,Replicate 1,Replicate 2,Replicate 3
