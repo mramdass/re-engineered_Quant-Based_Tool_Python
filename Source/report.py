@@ -2,7 +2,6 @@
 
 from genotype_combinations import Allele, Genotypes, Person, THETA
 from get_data import LOCUS, RACE, Constants, get_drop_out, get_drop_in, get_allele_freq, get_mixture
-from copy import copy, deepcopy
 
 class Report:
     def __init__(self, drop_out_db, knowns_pn, unknowns_pn, knowns_pd, unknowns_pd, genotypes, replicates, case_name, locus, constants):
