@@ -1,6 +1,14 @@
-# re-engineered_Quant-Based_Tool_Python
+# re-engineered_Quant-Based_Tool (Python Version)
 
-Research and develop probabilistic genotyping software in forensic DNA testing and casework. Devise a method for detecting the false positive rate for any potential genotype to a complex DNA mixture. Logic implemented in C++. GUI implemented in R. Made to replicate OCME's Forensic Statistical Tool (FST).
+This tool can be used to achieve likelihood ratio for suspect(s) and/or victim(s) in a DNA mixture using probabilistic genotyping
+
+re-engineered Quant-Based Tool Copyright (C) 2016 Munieshwar Ramdass
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
 
 ## Getting Started
 
@@ -100,4 +108,4 @@ INC - in place of a replicate if you wish to ignore that replicate
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details
