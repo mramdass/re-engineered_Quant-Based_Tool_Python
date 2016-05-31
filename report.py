@@ -183,7 +183,7 @@ class Report:
                         product *= self.drop_in(self.population_pn[i], self.replicates[j])
                         pno.write(str(self.drop_in(self.population_pn[i], self.replicates[j])) + ',') #
                     summation += product
-                    pno.write(',' + str(summation) + '\n') #
+                    pno.write(',' + str(product) + '\n') #
                     product = float(1.0)
 
             pno.close()
@@ -204,7 +204,7 @@ class Report:
                         product *= self.drop_in(self.population_pd[i], self.replicates[j])
                         pdo.write(str(self.drop_in(self.population_pd[i], self.replicates[j])) + ',') #
                     summation += product
-                    pdo.write(',' + str(summation) + '\n') #
+                    pdo.write(',' + str(product) + '\n') #
                     product = float(1.0)
             
             pdo.close()
@@ -233,16 +233,16 @@ class Report:
         if ID == "PN":
             if person.hom:
                 for i in range(0, len(alleles)):
-                    if person.a == alleles[i] and person.b == alleles[i]:
+                    if person.a.length == alleles[i] and person.b.length == alleles[i]:
                         return self.constants.PN_PHOM0
                 return self.constants.PN_PHOM1
             elif person.het:
                 present_first = False
                 present_second = False
                 for i in range(0, len(alleles)):
-                    if person.a == alleles[i]:
+                    if person.a.length == alleles[i]:
                         present_first = True
-                    if person.b == alleles[i]:
+                    if person.b.length == alleles[i]:
                         present_second = True
                 if present_first and present_second:
                     return self.constants.PN_PHET0
@@ -255,16 +255,16 @@ class Report:
         elif ID == "PD":
             if person.hom:
                 for i in range(0, len(alleles)):
-                    if person.a == alleles[i] and person.b == alleles[i]:
+                    if person.a.length == alleles[i] and person.b.length == alleles[i]:
                         return self.constants.PD_PHOM0
                 return self.constants.PD_PHOM1
             elif person.het:
                 present_first = False
                 present_second = False
                 for i in range(0, len(alleles)):
-                    if person.a == alleles[i]:
+                    if person.a.length == alleles[i]:
                         present_first = True
-                    if person.b == alleles[i]:
+                    if person.b.length == alleles[i]:
                         present_second = True
                 if present_first and present_second:
                     return self.constants.PD_PHET0
@@ -280,8 +280,8 @@ class Report:
     def drop_in(self, persons, alleles):
         tmp = []
         for i in range(0, len(persons)):
-            tmp.append(persons[i].a)
-            tmp.append(persons[i].b)
+            tmp.append(persons[i].a.length)
+            tmp.append(persons[i].b.length)
         tmp = set(tmp)
         c = 0
         for i in range(0, len(alleles)):
@@ -314,11 +314,11 @@ class Report:
             if float(quants[i]) < self.constants.QUANT and float(quants[i + 1]) > self.constants.QUANT:
                 l = quants[i]       # lower quant milepost
                 h = quants[i + 1]   # higher quant milepost
-        full = float(1.0)
+        full = 1
         for i in rates:
-            if i == 'HOM1' and self.constants.DEDUCIBLE:
+            if i == 'HOM1' and self.constants.DEDUCIBLE == 'D':
                 b = float(0.0)  # y-intercept or value for constant
-                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(1))
+                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(l))
                 b = db[i][contributors]['D'][self.locus][l] - (slope * float(l))
                 PHOM1 = slope * self.constants.QUANT + b
                 PHOM0 = full - PHOM1
@@ -328,18 +328,18 @@ class Report:
                 elif ID == "PD":
                     self.constants.PD_PHOM1 = PHOM1
                     self.constants.PD_PHOM0 = PHOM0
-            elif i == 'HET1' and self.constants.DEDUCIBLE:
+            elif i == 'HET1' and self.constants.DEDUCIBLE == 'D':
                 b = float(0.0)
-                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(1))
+                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(l))
                 b = db[i][contributors]['D'][self.locus][l] - (slope * float(l))
                 PHET1 = slope * self.constants.QUANT + b
                 if ID == "PN":
                     self.constants.PN_PHET1 = PHET1
                 elif ID == "PD":
                     self.constants.PD_PHET1 = PHET1
-            elif i == 'HET2' and self.constants.DEDUCIBLE:
+            elif i == 'HET2' and self.constants.DEDUCIBLE == 'D':
                 b = float(0.0)
-                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(1))
+                slope = (db[i][contributors]['D'][self.locus][h] - db[i][contributors]['D'][self.locus][l]) / (float(h) - float(l))
                 b = db[i][contributors]['D'][self.locus][l] - (slope * float(l))
                 PHET2 = slope * self.constants.QUANT + b
                 if ID == "PN":
@@ -348,9 +348,9 @@ class Report:
                 elif ID == "PD":
                     self.constants.PD_PHET2 = PHET2
                     self.constants.PD_PHET0 = full - (self.constants.PD_PHET1 + PHET2)
-            elif i == 'HOM1' and not self.constants.DEDUCIBLE:
+            elif i == 'HOM1' and self.constants.DEDUCIBLE == 'ND':
                 b = float(0.0)  # y-intercept or value for constant
-                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(1))
+                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(l))
                 b = db[i][contributors]['ND'][self.locus][l] - (slope * float(l))
                 PHOM1 = slope * self.constants.QUANT + b
                 PHOM0 = full - PHOM1
@@ -360,18 +360,18 @@ class Report:
                 elif ID == "PD":
                     self.constants.PD_PHOM1 = PHOM1
                     self.constants.PD_PHOM0 = PHOM0
-            elif i == 'HET1' and not self.constants.DEDUCIBLE:
+            elif i == 'HET1' and self.constants.DEDUCIBLE == 'ND':
                 b = float(0.0)
-                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(1))
+                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(l))
                 b = db[i][contributors]['ND'][self.locus][l] - (slope * float(l))
                 PHET1 = slope * self.constants.QUANT + b
                 if ID == "PN":
                     self.constants.PN_PHET1 = PHET1
                 elif ID == "PD":
                     self.constants.PD_PHET1 = PHET1
-            elif i == 'HET2' and not self.constants.DEDUCIBLE:
+            elif i == 'HET2' and self.constants.DEDUCIBLE == 'ND':
                 b = float(0.0)
-                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(1))
+                slope = (db[i][contributors]['ND'][self.locus][h] - db[i][contributors]['ND'][self.locus][l]) / (float(h) - float(l))
                 b = db[i][contributors]['ND'][self.locus][l] - (slope * float(l))
                 PHET2 = slope * self.constants.QUANT + b
                 if ID == "PN":
