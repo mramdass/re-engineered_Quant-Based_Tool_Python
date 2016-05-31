@@ -107,7 +107,7 @@ INC - in place of a replicate if you wish to ignore that replicate
 ## License
 
 
-re-engineered Quant-Based Tool Copyright (C) 2016 Munieshwar Ramdass
+re-engineered Quant-Based Tool Python Version Copyright (C) 2016 Munieshwar Ramdass
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
