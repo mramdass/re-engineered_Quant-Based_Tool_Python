@@ -2,14 +2,6 @@
 
 This tool can be used to achieve likelihood ratio for suspect(s) and/or victim(s) in a DNA mixture using probabilistic genotyping
 
-re-engineered Quant-Based Tool Copyright (C) 2016 Munieshwar Ramdass
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
-
 ## Getting Started
 
 Use these instructions to get started with reQBT (Python)
@@ -95,6 +87,12 @@ John Butler,D5,D,60,12;13,2,3,11;13,11;13,10;11;12;13;14
 John Butler,FGA,D,60,21;22,2,3,19;21;22;23;24;25;26,19;21;22;23;25,19;21;22;23;25;26
 ```
 
+To Run, double click on reQBT_Python_vX.X.py (where Xs represent version digits) or via command line:
+
+```
+python reQBT_Python_vX.X.py
+```
+
 Notes:
 
 ```
@@ -102,10 +100,17 @@ NEG - in place of a replicate if you wish to imply that all alleles dropped out;
 INC - in place of a replicate if you wish to ignore that replicate
 ```
 
-## Authors
+## Author
 
 * **Munieshwar Ramdass** - *Initial* - [re-engineered Quant-Based Tool](https://github.com/mramdass/re-engineered_Quant-Based_Tool)
 
 ## License
 
-This project is licensed under the GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details
+
+re-engineered Quant-Based Tool Copyright (C) 2016 Munieshwar Ramdass
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
