@@ -22,9 +22,19 @@ Clone/download this repository
 https://github.com/mramdass/re-engineered_Quant-Based_Tool_Python
 ```
 
-## Running the tests
+## Running
 
-Open case.csv and enter mixture information in the following format:
+Open case.csv and enter mixture information in the following format
+For each numerator known header column, you are required to number them - Knowns Pn 1, Knowns Pn 2, ...
+For each denominator known header column, you are required to number them - Knowns Pd 1, Knowns Pd 2, ...
+For each replicate header column, you are required to number them - Replicate 1, Replicate 2, ...
+Case Name is a string value
+Locus is the short hand version of each of the 15 loci
+Contributors is an integer ranging from 1 to 3 inclusively
+Deducible is a string value of either "D" or "ND"
+Quant is a float value ranging from 6.25 to 500 (any other values will be adjusted to the minimum or maximum quant for that mixture
+Known and Replicate columns, float values representing allele lengths must be semicolom delimited
+Here is the John Bulter CSV Formation done three ways (the first is ideal, while the other two are for experimental purposes):
 
 ```
 Case Name,Locus,Contributors,Deducible,Quant,Known Pn 1,Replicate 1,Replicate 2,Replicate 3
