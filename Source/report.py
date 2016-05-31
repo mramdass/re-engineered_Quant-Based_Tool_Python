@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from genotype_combinations import Allele, Genotypes, Person, THETA
 from get_data import LOCUS, RACE, Constants, get_drop_out, get_drop_in, get_allele_freq, get_mixture
 from copy import copy, deepcopy
@@ -51,13 +53,15 @@ class Report:
             self.population_pd.append(wild_vector)
             del wild_vector[:]
 
-        self.check_person()
-        for i in self.knowns_pn:
-            print i.a.length, ',', i.b.length
+        person_map = {}
+        for i in self.persons:
+            person_map[(i.a.length, i.b.length)] = i
+        self.check_person(person_map)
+        
         self.pn = self.generate_px(drop_out_db, "PN")
         self.pd = self.generate_px(drop_out_db, "PD")
         self.lr = self.pn / self.pd
-        print self.lr, self.pn, self.pd
+        print self.case_name, self.locus, self.constants.RACE, "LR:", self.lr, "PN:", self.pn, "PD:", self.pd
 
     def permute(self, number_items, length, position, depth, perimeter, ID):
         if depth >= length:
@@ -86,7 +90,7 @@ class Report:
             for j in range(i, len(self.genotypes.alleles)):
                 self.persons.append(Person(self.genotypes.alleles[i], self.genotypes.alleles[j]))
 
-    def check_person(self):
+    def check_person(self, person_map):
         '''
             If a person's allele(s) is/are not found in the replicates,
             change that/those allele(s) to the wild allele.
@@ -95,7 +99,6 @@ class Report:
             This is done for both PN and PD.
         '''
         for i in range(0, len(self.knowns_pn)):
-            found_two = False
             found_a = False
             found_b = False
             for j in range(0, len(self.replicates)):
@@ -105,24 +108,12 @@ class Report:
                     if self.knowns_pn[i].b.length == self.replicates[j][k]:
                         found_b = True
             if found_a and not found_b:
-                self.knowns_pn[i].b = self.persons[len(self.persons) - 1].b
-                self.knowns_pn[i].generate_freq()
+                self.knowns_pn[i] = person_map[(self.knowns_pn[i].a.length, -1)]
             if not found_a and found_b:
-                self.knowns_pn[i].a = self.knowns_pn[i].b
-                self.knowns_pn[i].b = self.persons[len(self.persons) - 1].b
-                self.knowns_pn[i].generate_freq()
+                self.knowns_pn[i] = person_map[(self.knowns_pn[i].b.length, -1)]
             if not found_a and not found_b:
-                self.knowns_pn[i].b = self.persons[len(self.persons) - 1].b
-                self.knowns_pn[i].a = self.persons[len(self.persons) - 1].a
-                self.knowns_pn[i].generate_freq()
-            if self.knowns_pn[i].a.is_equal(self.knowns_pn[i].b):
-                self.knowns_pn[i].hom = True
-                self.knowns_pn[i].het = False
-            else:
-                self.knowns_pn[i].hom = False
-                self.knowns_pn[i].het = True
+                self.knowns_pn[i] = person_map[(-1, -1)]
         for i in range(0, len(self.knowns_pd)):
-            found_two = False
             found_a = False
             found_b = False
             for j in range(0, len(self.replicates)):
@@ -132,22 +123,11 @@ class Report:
                     if self.knowns_pd[i].b == self.replicates[j][k]:
                         found_b = True
             if found_a and not fonud_b:
-                self.knowns_pd[i].b = self.persons[len(self.persons) - 1].b
-                self.knowns_pd[i].generate_freq()
+                self.knowns_pd[i] = person_map[(self.knowns_pd[i].a.length, -1)]
             if not found_a and found_b:
-                self.knowns_pd[i].a = self.knowns_pd[i].b
-                self.knowns_pd[i].b = self.persons[len(self.persons) - 1].b
-                self.knowns_pd[i].generate_freq()
+                self.knowns_pd[i] = person_map[(self.knowns_pd[i].b.length, -1)]
             if not found_a and not found_b:
-                self.knowns_pd[i].b = self.persons[len(self.persons) - 1].b
-                self.knowns_pd[i].a = self.persons[len(self.persons) - 1].a
-                self.knowns_pd[i].generate_freq()
-            if self.knowns_pd[i].a.is_equal(self.knowns_pd[i].b):
-                self.knowns_pd[i].hom = True
-                self.knowns_pd[i].het = False
-            else:
-                self.knowns_pd[i].hom = False
-                self.knowns_pd[i].het = True
+                self.knowns_pd[i] = person_map[(-1, -1)]
 
     def generate_populations(self):
         for i in range(0, len(self.indicies_pn)):
@@ -158,56 +138,52 @@ class Report:
                 self.population_pd[i][j] = Person(self.genotypes.allele_comb[self.indicies_pd[i][j]][0], self.genotypes.allele_comb[self.indicies_pd[i][j]][1])
 
     def generate_px(self, db, ID):
-        if ID == "PN":
-            self.set_drop_out(db, self.constants.CONTRIBUTORS_PN, ID)
-        elif ID == "PD":
-            self.set_drop_out(db, self.constants.CONTRIBUTORS_PD, ID)
-        else:
-            print "class Report (generate_px) ID is incorrectly inputted"
         product = float(1.0)
         summation = float(0.0)
         
         if ID == "PN":
-            pno = open('output/PN_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
+            self.set_drop_out(db, self.constants.CONTRIBUTORS_PN, ID)
+            #pno = open('output/PN_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
             for i in range(0, len(self.population_pn)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pn[i])):
                         if j >= (self.unknowns_pn + len(self.knowns_pn)) - ((self.unknowns_pn + len(self.knowns_pn)) - len(self.knowns_pn)):
                             product *= self.population_pn[i][j].freq
-                            pno.write(str(self.population_pn[i][j].freq) + ',') #
+                            #pno.write(str(self.population_pn[i][j].freq) + ',') #
                     for j in range(0, len(self.population_pn[i])):
                         for k in range(0, len(self.replicates)):
                             product *= self.drop_out(self.population_pn[i][j], self.replicates[k], ID)
-                            pno.write(str(self.drop_out(self.population_pn[i][j], self.replicates[k], ID)) + ',') #
+                            #pno.write(str(self.drop_out(self.population_pn[i][j], self.replicates[k], ID)) + ',') #
                     for j in range(0, len(self.replicates)):
                         product *= self.drop_in(self.population_pn[i], self.replicates[j])
-                        pno.write(str(self.drop_in(self.population_pn[i], self.replicates[j])) + ',') #
+                        #pno.write(str(self.drop_in(self.population_pn[i], self.replicates[j])) + ',') #
                     summation += product
-                    pno.write(',' + str(product) + '\n') #
+                    #pno.write(',' + str(product) + ',' + str(summation) + '\n') #
                     product = float(1.0)
 
-            pno.close()
+            #pno.close()
             return summation
         elif ID == "PD":
-            pdo = open('output/PD_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
+            self.set_drop_out(db, self.constants.CONTRIBUTORS_PD, ID)
+            #pdo = open('output/PD_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
             for i in range(0, len(self.population_pd)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pd[i])):
                         if j >= (self.unknowns_pd + len(self.knowns_pd)) - ((self.unknowns_pd + len(self.knowns_pd)) - len(self.knowns_pd)):
                             product *= self.population_pd[i][j].freq
-                            pdo.write(str(self.population_pd[i][j].freq) + ',') #
+                            #pdo.write(str(self.population_pd[i][j].freq) + ',') #
                     for j in range(0, len(self.population_pd[i])):
                         for k in range(0, len(self.replicates)):
                             product *= self.drop_out(self.population_pd[i][j], self.replicates[k], ID)
-                            pdo.write(str(self.drop_out(self.population_pd[i][j], self.replicates[k], ID)) + ',') #
+                            #pdo.write(str(self.drop_out(self.population_pd[i][j], self.replicates[k], ID)) + ',') #
                     for j in range(0, len(self.replicates)):
                         product *= self.drop_in(self.population_pd[i], self.replicates[j])
-                        pdo.write(str(self.drop_in(self.population_pd[i], self.replicates[j])) + ',') #
+                        #pdo.write(str(self.drop_in(self.population_pd[i], self.replicates[j])) + ',') #
                     summation += product
-                    pdo.write(',' + str(product) + '\n') #
+                    #pdo.write(',' + str(product) + ',' + str(summation) + '\n') #
                     product = float(1.0)
             
-            pdo.close()
+            #pdo.close()
             return summation
         else:
             print "class Report (generate_px) ID is incorrectly inputted"
@@ -301,13 +277,6 @@ class Report:
             rates.append(i)
         rates.sort()    # need HET1, then HET2
         quants = ['6.25', '12.5', '25', '50', '100', '150', '250', '500']
-        '''
-        for i in db['HET1']['1']['D']['FGA']:
-            quants.append(i)
-        quants = [float(i) for i in quants]
-        quants.sort()
-        quants = [str(i) for i in quants]
-        '''
         l = '25'
         h = '50'
         for i in range(0, len(quants)):
@@ -389,32 +358,13 @@ def generate_wild_allele_freq(alleles, minimum):
         return minimum
     return c
 
-'''
-for i in name_files():
-    if i.startswith('Evidence_'):
-        numbers = read(i)
-
-import json
-
-with open('odb.json', 'w') as o:
-    o.write(json.dumps(get_drop_out('Drop_Out_Rates.csv'), indent=4))
-
-with open('adb.json', 'w') as o:
-    o.write(json.dumps(get_allele_freq('Allele_Frequencies.csv'), indent=4))
-
-with open('idb.json', 'w') as o:
-    o.write(json.dumps(get_drop_in('Drop_In_Rates.csv'), indent=4))
-
-import json
-with open('cdb.json', 'w') as o:
-    o.write(json.dumps(get_mixture('case.csv'), indent=4))
-'''
-
 def gather():
     odb = get_drop_out('Drop_Out_Rates.csv')
     idb = get_drop_in('Drop_In_Rates.csv')
     adb = get_allele_freq('Allele_Frequencies.csv')
-    cdb = get_mixture('case.csv')
+    cdb = get_mixture('../case.csv')
+    with open('../output.csv', 'w') as o:
+        o.write('Case,Race,LR,PN,PD')
     for case in cdb:
         constants = Constants()
         THETA = idb['THETA']
@@ -480,6 +430,8 @@ def gather():
                 constants.MINIMUM_WILD_FREQUENCY = float(idb['A-MIN-WILD-FREQ'])
 
             Overall_LR = float(1.0)
+            Overall_PN = float(1.0)
+            Overall_PD = float(1.0)
             for locus in LOCUS:
                 alleles = []
                 for length in cdb[case][locus]['Unique Alleles']:
@@ -524,7 +476,10 @@ def gather():
                     reps.append(cdb[case][locus]['Replicate 3'])
                 report = Report(odb, kpn, num_unknowns_pn, kpd, num_unknowns_pd, genotypes, reps, case, locus, constants)
                 Overall_LR *= report.lr
-            print case, race, Overall_LR
-    
+                Overall_PN *= report.pn
+                Overall_PD *= report.pd
+            print case, race, Overall_LR, Overall_PN, Overall_PD
+            with open('../output.csv', 'a') as o:
+                o.write(case + ',' + report.constants.RACE + ',' + str(Overall_LR) + ',' + str(Overall_PN) + ',' + str(Overall_PD) + '\n')
 
 gather()
