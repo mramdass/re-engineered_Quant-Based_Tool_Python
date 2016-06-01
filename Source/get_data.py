@@ -223,7 +223,9 @@ def get_mixture(name):
                 unique_alleles += tmp[case][locus]['Replicate 2']
             if 'Replicate 3' in tmp[case][locus]:
                 unique_alleles += tmp[case][locus]['Replicate 3']
-            tmp[case][locus]['Unique Alleles'] = list(set(unique_alleles))
+            unique_list = list(set(unique_alleles))
+            unique_list.sort()
+            tmp[case][locus]['Unique Alleles'] = unique_list
     
     return tmp
             

@@ -17,7 +17,7 @@ class Report:
         self.constants = constants
 
         FREQ_CORRECTION = self.constants.MINIMUM_WILD_FREQUENCY
-
+        
         self.indicies_pn = []
         self.indicies_pd = []
         
@@ -279,10 +279,20 @@ class Report:
         quants = ['6.25', '12.5', '25', '50', '100', '150', '250', '500']
         l = '25'
         h = '50'
-        for i in range(0, len(quants)):
-            if float(quants[i]) < self.constants.QUANT and float(quants[i + 1]) > self.constants.QUANT:
-                l = quants[i]       # lower quant milepost
-                h = quants[i + 1]   # higher quant milepost
+        if self.constants.QUANT == 6.25 and contributors == 1:
+            l = quants[0]
+            h = quants[1]
+        elif self.constants.QUANT == 25.0 and contributors > 1:
+            l = quants[2]
+            h = quants[3]
+        elif self.constants.QUANT == 500.0:
+            l = quants[6]
+            h = quants[7]
+        else:
+            for i in range(0, len(quants)):
+                if float(quants[i]) <= self.constants.QUANT and float(quants[i + 1]) > self.constants.QUANT:
+                    l = quants[i]       # lower quant milepost
+                    h = quants[i + 1]   # higher quant milepost
         full = 1
         for i in rates:
             if i == 'HOM1' and self.constants.DEDUCIBLE == 'D':
@@ -358,7 +368,7 @@ def generate_wild_allele_freq(alleles, minimum):
         return minimum
     return c
 
-def gather(race):
+def gather():
     odb = get_drop_out('Drop_Out_Rates.csv')
     idb = get_drop_in('Drop_In_Rates.csv')
     adb = get_allele_freq('Allele_Frequencies.csv')
@@ -399,12 +409,13 @@ def gather(race):
             num_unknowns_pn = constants.CONTRIBUTORS_PN - num_knowns_pn
             num_unknowns_pd = constants.CONTRIBUTORS_PD - num_knowns_pd
         constants.QUANT = float(cdb[case]['Quant'])
-        if constants.QUANT > 500:
-            constants.QUANT = 500
-        if constants.QUANT < 25 and constants.CONTRIBUTORS_PN > 1:
-            constants.QUANT = 25
-        if constants.QUANT < 6.25 and constants.CONTRIBUTORS_PN == 1:
+        
+        if constants.QUANT < 6.25 and (constants.CONTRIBUTORS_PN == 1 or constants.CONTRIBUTORS_PD == 1):
             constants.QUANT = 6.25
+        elif constants.QUANT < 25.0 and (constants.CONTRIBUTORS_PN > 1 or constants.CONTRIBUTORS_PD > 1):
+            constants.QUANT = 25.0
+        elif constants.QUANT > 500:
+            constants.QUANT = 500.0
         if 'Deducible' in cdb[case]:
             constants.DEDUCIBLE = cdb[case]['Deducible']
 
@@ -418,72 +429,74 @@ def gather(race):
             constants.PC2 = float(idb['HPC2'])
         constants.THETA = float(idb['THETA'])
 
-        #for race in RACE:
-        constants.RACE = race
-        if constants.RACE == "BLACK":
-            constants.MINIMUM_WILD_FREQUENCY = float(idb['B-MIN-WILD-FREQ'])
-        elif constants.RACE == "CAUCASIAN":
-            constants.MINIMUM_WILD_FREQUENCY = float(idb['C-MIN-WILD-FREQ'])
-        elif constants.RACE == "HISPANIC":
-            constants.MINIMUM_WILD_FREQUENCY = float(idb['H-MIN-WILD-FREQ'])
-        elif constants.RACE == "ASIAN":
-            constants.MINIMUM_WILD_FREQUENCY = float(idb['A-MIN-WILD-FREQ'])
+        for race in RACE:
+            constants.RACE = race
+            if constants.RACE == "BLACK":
+                constants.MINIMUM_WILD_FREQUENCY = float(idb['B-MIN-WILD-FREQ'])
+            elif constants.RACE == "CAUCASIAN":
+                constants.MINIMUM_WILD_FREQUENCY = float(idb['C-MIN-WILD-FREQ'])
+            elif constants.RACE == "HISPANIC":
+                constants.MINIMUM_WILD_FREQUENCY = float(idb['H-MIN-WILD-FREQ'])
+            elif constants.RACE == "ASIAN":
+                constants.MINIMUM_WILD_FREQUENCY = float(idb['A-MIN-WILD-FREQ'])
 
-        Overall_LR = float(1.0)
-        Overall_PN = float(1.0)
-        Overall_PD = float(1.0)
+            Overall_LR = float(1.0)
+            Overall_PN = float(1.0)
+            Overall_PD = float(1.0)
 
-        for locus in LOCUS:
-            alleles = []
-            for length in cdb[case][locus]['Unique Alleles']:
-                alleles.append(Allele(locus, length, adb[locus][length][race]))
-            alleles.append(Allele("W", -1, generate_wild_allele_freq(alleles, constants.MINIMUM_WILD_FREQUENCY)))
+            for locus in LOCUS:
+                alleles = []
+                for length in cdb[case][locus]['Unique Alleles']:
+                    alleles.append(Allele(locus, length, adb[locus][length][race]))
+                alleles.append(Allele("W", -1, generate_wild_allele_freq(alleles, constants.MINIMUM_WILD_FREQUENCY)))
+                
+                genotypes = Genotypes(alleles)
+                
+                kpn = []
+                if "Known Pn 1" in cdb[case][locus]:
+                    a = cdb[case][locus]["Known Pn 1"][0]
+                    b = cdb[case][locus]["Known Pn 1"][1]
+                    kpn.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
+                if "Known Pn 2" in cdb[case][locus]:
+                    a = cdb[case][locus]["Known Pn 2"][0]
+                    b = cdb[case][locus]["Known Pn 2"][1]
+                    kpn.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
+                if "Known Pn 3" in cdb[case][locus]:
+                    a = cdb[case][locus]["Known Pn 3"][0]
+                    b = cdb[case][locus]["Known Pn 3"][1]
+                    kpn.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
+                kpd = []
+                if "Known Pd 1" in cdb[case][locus]:
+                    a = cdb[case][locus]["Known Pd 1"][0]
+                    b = cdb[case][locus]["Known Pd 1"][1]
+                    kpd.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
+                if "Known Pd 2" in cdb[case][locus]:
+                    a = cdb[case][locus]["Known Pd 2"][0]
+                    b = cdb[case][locus]["Known Pd 2"][1]
+                    kpd.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
+                if "Known Pd 3" in cdb[case][locus]:
+                    a = cdb[case][locus]["Known Pd 3"][0]
+                    b = cdb[case][locus]["Known Pd 3"][1]
+                    kpd.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
 
-            genotypes = Genotypes(alleles)
-            
-            kpn = []
-            if "Known Pn 1" in cdb[case][locus]:
-                a = cdb[case][locus]["Known Pn 1"][0]
-                b = cdb[case][locus]["Known Pn 1"][1]
-                kpn.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
-            if "Known Pn 2" in cdb[case][locus]:
-                a = cdb[case][locus]["Known Pn 2"][0]
-                b = cdb[case][locus]["Known Pn 2"][1]
-                kpn.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
-            if "Known Pn 3" in cdb[case][locus]:
-                a = cdb[case][locus]["Known Pn 3"][0]
-                b = cdb[case][locus]["Known Pn 3"][1]
-                kpn.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
-            kpd = []
-            if "Known Pd 1" in cdb[case][locus]:
-                a = cdb[case][locus]["Known Pd 1"][0]
-                b = cdb[case][locus]["Known Pd 1"][1]
-                kpd.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
-            if "Known Pd 2" in cdb[case][locus]:
-                a = cdb[case][locus]["Known Pd 2"][0]
-                b = cdb[case][locus]["Known Pd 2"][1]
-                kpd.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
-            if "Known Pd 3" in cdb[case][locus]:
-                a = cdb[case][locus]["Known Pd 3"][0]
-                b = cdb[case][locus]["Known Pd 3"][1]
-                kpd.append(Person(Allele(locus, a, adb[locus][a][race]), Allele(locus, b, adb[locus][b][race])))
-
-            reps = []
-            if "Replicate 1" in cdb[case][locus]:
-                reps.append(cdb[case][locus]['Replicate 1'])
-            if "Replicate 2" in cdb[case][locus]:
-                reps.append(cdb[case][locus]['Replicate 2'])
-            if "Replicate 3" in cdb[case][locus]:
-                reps.append(cdb[case][locus]['Replicate 3'])
-            report = Report(odb, kpn, num_unknowns_pn, kpd, num_unknowns_pd, genotypes, reps, case, locus, constants)
-            
-            Overall_LR *= report.lr
-            Overall_PN *= report.pn
-            Overall_PD *= report.pd
-        print case, race, Overall_LR, Overall_PN, Overall_PD
-        with open('../output.csv', 'a') as o:
-            o.write(case + ',' + report.constants.RACE + ',' + str(Overall_LR) + ',' + str(Overall_PN) + ',' + str(Overall_PD) + '\n')
-
+                reps = []
+                if "Replicate 1" in cdb[case][locus]:
+                    reps.append(cdb[case][locus]['Replicate 1'])
+                if "Replicate 2" in cdb[case][locus]:
+                    reps.append(cdb[case][locus]['Replicate 2'])
+                if "Replicate 3" in cdb[case][locus]:
+                    reps.append(cdb[case][locus]['Replicate 3'])
+                report = Report(odb, kpn, num_unknowns_pn, kpd, num_unknowns_pd, genotypes, reps, case, locus, constants)
+                
+                Overall_LR *= report.lr
+                Overall_PN *= report.pn
+                Overall_PD *= report.pd
+            print case, race, Overall_LR, Overall_PN, Overall_PD
+            with open('../output.csv', 'a') as o:
+                o.write(case + ',' + report.constants.RACE + ',' + str(Overall_LR) + ',' + str(Overall_PN) + ',' + str(Overall_PD) + '\n')
+'''
 if __name__ == '__main__':
     p = Pool(6)
     p.map(gather, RACE)
+'''
+gather()
