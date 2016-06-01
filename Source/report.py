@@ -122,7 +122,7 @@ class Report:
                         found_a = True
                     if self.knowns_pd[i].b == self.replicates[j][k]:
                         found_b = True
-            if found_a and not fonud_b:
+            if found_a and not found_b:
                 self.knowns_pd[i] = person_map[(self.knowns_pd[i].a.length, -1)]
             if not found_a and found_b:
                 self.knowns_pd[i] = person_map[(self.knowns_pd[i].b.length, -1)]
