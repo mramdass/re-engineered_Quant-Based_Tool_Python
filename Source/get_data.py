@@ -174,13 +174,22 @@ def get_mixture(name):
             for j in LOCUS:
                 tmp[i[0]][j] = {}
                 if 'Replicate 1' in head:
-                    tmp[i[0]][j]['Replicate 1'] = [float(k) for k in i[head['Replicate 1']].split(';')]
+                    if i[head['Replicate 1']] not in ['INC', 'NEG', '']:
+                        tmp[i[0]][j]['Replicate 1'] = [float(k) for k in i[head['Replicate 1']].split(';')]
+                    elif i[head['Replicate 1']] == 'NEG':
+                        tmp[i[0]][j]['Replicate 1'] = []
                     
                 if 'Replicate 2' in head:
-                    tmp[i[0]][j]['Replicate 2'] = [float(k) for k in i[head['Replicate 2']].split(';')]
+                    if i[head['Replicate 2']] not in ['INC', 'NEG', '']:
+                        tmp[i[0]][j]['Replicate 2'] = [float(k) for k in i[head['Replicate 2']].split(';')]
+                    elif i[head['Replicate 2']] == 'NEG':
+                        tmp[i[0]][j]['Replicate 2'] = []
                     
                 if 'Replicate 3' in head:
-                    tmp[i[0]][j]['Replicate 3'] = [float(k) for k in i[head['Replicate 3']].split(';')]
+                    if i[head['Replicate 3']] not in ['INC', 'NEG', '']:
+                        tmp[i[0]][j]['Replicate 3'] = [float(k) for k in i[head['Replicate 3']].split(';')]
+                    elif i[head['Replicate 3']] == 'NEG':
+                        tmp[i[0]][j]['Replicate 3'] = []
                     
                 if 'Known Pn 1' in head:
                     tmp[i[0]][j]['Known Pn 1'] = (float(i[head['Known Pn 1']].split(';')[0]), float(i[head['Known Pn 1']].split(';')[1]))
@@ -196,11 +205,21 @@ def get_mixture(name):
                     tmp[i[0]][j]['Known Pd 3'] = (float(i[head['Known Pd 3']].split(';')[0]), float(i[head['Known Pd 3']].split(';')[1]))
         elif i[0] != 'Case Name':
             if 'Replicate 1' in head:
-                tmp[i[0]][i[head['Locus']]]['Replicate 1'] = [float(k) for k in i[head['Replicate 1']].split(';')]
+                if i[head['Replicate 1']] not in ['INC', 'NEG', '']:
+                    tmp[i[0]][i[head['Locus']]]['Replicate 1'] = [float(k) for k in i[head['Replicate 1']].split(';')]
+                elif i[head['Replicate 1']] == 'NEG':
+                        tmp[i[0]][j]['Replicate 1'] = []
             if 'Replicate 2' in head:
-                tmp[i[0]][i[head['Locus']]]['Replicate 2'] = [float(k) for k in i[head['Replicate 2']].split(';')]
+                if i[head['Replicate 2']] not in ['INC', 'NEG', '']:
+                    tmp[i[0]][i[head['Locus']]]['Replicate 2'] = [float(k) for k in i[head['Replicate 2']].split(';')]
+                elif i[head['Replicate 2']] == 'NEG':
+                        tmp[i[0]][j]['Replicate 2'] = []
             if 'Replicate 3' in head:
-                tmp[i[0]][i[head['Locus']]]['Replicate 3'] = [float(k) for k in i[head['Replicate 3']].split(';')]
+                if i[head['Replicate 3']] not in ['INC', 'NEG', '']:
+                    tmp[i[0]][i[head['Locus']]]['Replicate 3'] = [float(k) for k in i[head['Replicate 3']].split(';')]
+                elif i[head['Replicate 3']] == 'NEG':
+                        tmp[i[0]][j]['Replicate 3'] = []
+            
             if 'Known Pn 1' in head:
                 tmp[i[0]][i[head['Locus']]]['Known Pn 1'] = (float(i[head['Known Pn 1']].split(';')[0]), float(i[head['Known Pn 1']].split(';')[1]))
             if 'Known Pn 2' in head:
