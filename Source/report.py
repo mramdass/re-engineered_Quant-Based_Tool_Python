@@ -4,6 +4,8 @@ from genotype_combinations import Allele, Genotypes, Person, THETA
 from get_data import LOCUS, RACE, Constants, get_drop_out, get_drop_in, get_allele_freq, get_mixture
 from multiprocessing import Pool
 
+#result = []
+
 class Report:
     def __init__(self, drop_out_db, knowns_pn, unknowns_pn, knowns_pd, unknowns_pd, genotypes, replicates, case_name, locus, constants):
         self.knowns_pn = knowns_pn
@@ -40,16 +42,16 @@ class Report:
         self.generate_populations()
         
         wild_vector = []
-        if self.persons[0].a.length == -1 and self.person[0].b.length == -1:
-            del population_pn[:]
-            for i in range(0, knowns_pn.size() + unknowns_pn):
-                wild_vector.append(persons[0])
+        if self.persons[0].a.length == -1 and self.persons[0].b.length == -1:
+            del self.population_pn[:]
+            for i in range(0, len(knowns_pn) + unknowns_pn):
+                wild_vector.append(self.persons[0])
             self.population_pn.append(wild_vector)
             del wild_vector[:]
-        if self.persons[0].a.length == -1 and self.person[0].b.length == -1:
-            del population_pd[:]
-            for i in range(0, knowns_pd.size() + unknowns_pd):
-                wild_vector.append(persons[0])
+        if self.persons[0].a.length == -1 and self.persons[0].b.length == -1:
+            del self.population_pd[:]
+            for i in range(0, len(knowns_pd) + unknowns_pd):
+                wild_vector.append(self.persons[0])
             self.population_pd.append(wild_vector)
             del wild_vector[:]
 
@@ -373,9 +375,12 @@ def gather(race):
     idb = get_drop_in('Drop_In_Rates.csv')
     adb = get_allele_freq('Allele_Frequencies.csv')
     cdb = get_mixture('../case.csv')
-    with open('../output.csv', 'w') as o:
-        o.write('Case,Race,LR,PN,PD\n')
+    #with open('../output.csv', 'w') as o:
+        #o.write('Case,Race,LR,PN,PD\n')
+    #with open('log.txt', 'w') as log:
+        #log.write('LOG FILE\n')
     for case in cdb:
+        
         constants = Constants()
         THETA = idb['THETA']
         constants.THETHA = THETA # Redundant
@@ -445,6 +450,8 @@ def gather(race):
         Overall_PD = float(1.0)
 
         for locus in LOCUS:
+            #with open('log.txt', 'a') as log:
+                #log.write(case + ' ' + locus + ' ' + race + '\n')
             alleles = []
             for length in cdb[case][locus]['Unique Alleles']:
                 alleles.append(Allele(locus, length, adb[locus][length][race]))
@@ -492,11 +499,29 @@ def gather(race):
             Overall_PN *= report.pn
             Overall_PD *= report.pd
         print case, race, Overall_LR, Overall_PN, Overall_PD
+        #result.append((case, race, Overall_LR, Overall_PN, Overall_PD))
+        '''
+        result[case][race + '_LR'] = Overall_LR
+        result[case][race + '_PN'] = Overall_PN
+        result[case][race + '_PD'] = Overall_PD
+        '''
+        
         with open('../output.csv', 'a') as o:
             o.write(case + ',' + report.constants.RACE + ',' + str(Overall_LR) + ',' + str(Overall_PN) + ',' + str(Overall_PD) + '\n')
 
 if __name__ == '__main__':
-    p = Pool(6)
+    with open('../output.csv', 'w') as o:
+        o.write('Case,Race,LR,PN,PD\n')
+    p = Pool(8)
     p.map(gather, RACE)
+    '''
+    with open('../output.csv', 'w') as o:
+        o.write('Case,Race,LR,PN,PD\n')
+        #o.write('Case,Black LR,Black PN,Black PD,Caucasian LR,Caucasian PN,Caucasian PD,Hispanic LR,Hispanic PN,Hispanic PD,Asian LR,Asian PN,Asian PD,\n')
+        for i in result:
+            o.write(result[0] + ',' + result[1] + ',' + result[2] + ',' + result[3] + ',' + result[4] + '\n')
+            #o.write(result[key] + ',' + result[key]['BLACK_LR'] + ',' + result[key]['BLACK_PN'] + ',' + result[key]['BLACK_PD'] + ',' + result[key]['CAUCASIAN_LR'] + ',' + result[key]['CAUCASIAN_PN'] + ',' + result[key]['CAUCASIAN_PD'] + ',' + result[key]['HISPANIC_LR'] + ',' + result[key]['HISPANIC_PN'] + ',' + result[key]['HISPANIC_PD'] + ',' + result[key]['ASIAN_LR'] + ',' + result[key]['ASIAN_PN'] + ',' + result[key]['ASIAN_PD'] +'\n')
+        o.close()
+    '''
 
 #gather()
