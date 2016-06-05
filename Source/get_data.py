@@ -201,17 +201,23 @@ def get_mixture(name):
                             tmp[i[0]][j].pop('Replicate 3')
                     
                 if 'Known Pn 1' in head:
-                    tmp[i[0]][j]['Known Pn 1'] = (float(i[head['Known Pn 1']].split(';')[0]), float(i[head['Known Pn 1']].split(';')[1]))
+                    if i[head['Known Pn 1']] != '':
+                        tmp[i[0]][j]['Known Pn 1'] = (float(i[head['Known Pn 1']].split(';')[0]), float(i[head['Known Pn 1']].split(';')[1]))
                 if 'Known Pn 2' in head:
-                    tmp[i[0]][j]['Known Pn 2'] = (float(i[head['Known Pn 2']].split(';')[0]), float(i[head['Known Pn 2']].split(';')[1]))
+                    if i[head['Known Pn 2']] != '':
+                        tmp[i[0]][j]['Known Pn 2'] = (float(i[head['Known Pn 2']].split(';')[0]), float(i[head['Known Pn 2']].split(';')[1]))
                 if 'Known Pn 3' in head:
-                    tmp[i[0]][j]['Known Pn 3'] = (float(i[head['Known Pn 3']].split(';')[0]), float(i[head['Known Pn 3']].split(';')[1]))
+                    if i[head['Known Pn 3']] != '':
+                        tmp[i[0]][j]['Known Pn 3'] = (float(i[head['Known Pn 3']].split(';')[0]), float(i[head['Known Pn 3']].split(';')[1]))
                 if 'Known Pd 1' in head:
-                    tmp[i[0]][j]['Known Pd 1'] = (float(i[head['Known Pd 1']].split(';')[0]), float(i[head['Known Pd 1']].split(';')[1]))
+                    if i[head['Known Pd 1']] != '':
+                        tmp[i[0]][j]['Known Pd 1'] = (float(i[head['Known Pd 1']].split(';')[0]), float(i[head['Known Pd 1']].split(';')[1]))
                 if 'Known Pd 2' in head:
-                    tmp[i[0]][j]['Known Pd 2'] = (float(i[head['Known Pd 2']].split(';')[0]), float(i[head['Known Pd 2']].split(';')[1]))
+                    if i[head['Known Pd 2']] != '':
+                        tmp[i[0]][j]['Known Pd 2'] = (float(i[head['Known Pd 2']].split(';')[0]), float(i[head['Known Pd 2']].split(';')[1]))
                 if 'Known Pd 3' in head:
-                    tmp[i[0]][j]['Known Pd 3'] = (float(i[head['Known Pd 3']].split(';')[0]), float(i[head['Known Pd 3']].split(';')[1]))
+                    if i[head['Known Pd 3']] != '':
+                        tmp[i[0]][j]['Known Pd 3'] = (float(i[head['Known Pd 3']].split(';')[0]), float(i[head['Known Pd 3']].split(';')[1]))
         elif i[0] != 'Case Name':
             if 'Replicate 1' in head:
                 if i[head['Replicate 1']] not in ['INC', 'NEG', '']:
@@ -239,17 +245,23 @@ def get_mixture(name):
                         tmp[i[0]][i[head['Locus']]].pop('Replicate 3')
             
             if 'Known Pn 1' in head:
-                tmp[i[0]][i[head['Locus']]]['Known Pn 1'] = (float(i[head['Known Pn 1']].split(';')[0]), float(i[head['Known Pn 1']].split(';')[1]))
+                if i[head['Known Pn 1']] != '':
+                    tmp[i[0]][i[head['Locus']]]['Known Pn 1'] = (float(i[head['Known Pn 1']].split(';')[0]), float(i[head['Known Pn 1']].split(';')[1]))
             if 'Known Pn 2' in head:
-                tmp[i[0]][i[head['Locus']]]['Known Pn 2'] = (float(i[head['Known Pn 2']].split(';')[0]), float(i[head['Known Pn 2']].split(';')[1]))
+                if i[head['Known Pn 2']] != '':
+                    tmp[i[0]][i[head['Locus']]]['Known Pn 2'] = (float(i[head['Known Pn 2']].split(';')[0]), float(i[head['Known Pn 2']].split(';')[1]))
             if 'Known Pn 3' in head:
-                tmp[i[0]][i[head['Locus']]]['Known Pn 3'] = (float(i[head['Known Pn 3']].split(';')[0]), float(i[head['Known Pn 3']].split(';')[1]))
+                if i[head['Known Pn 3']] != '':
+                    tmp[i[0]][i[head['Locus']]]['Known Pn 3'] = (float(i[head['Known Pn 3']].split(';')[0]), float(i[head['Known Pn 3']].split(';')[1]))
             if 'Known Pd 1' in head:
-                tmp[i[0]][i[head['Locus']]]['Known Pd 1'] = (float(i[head['Known Pd 1']].split(';')[0]), float(i[head['Known Pd 1']].split(';')[1]))
+                if i[head['Known Pd 1']] != '':
+                    tmp[i[0]][i[head['Locus']]]['Known Pd 1'] = (float(i[head['Known Pd 1']].split(';')[0]), float(i[head['Known Pd 1']].split(';')[1]))
             if 'Known Pd 2' in head:
-                tmp[i[0]][i[head['Locus']]]['Known Pd 2'] = (float(i[head['Known Pd 2']].split(';')[0]), float(i[head['Known Pd 2']].split(';')[1]))
+                if i[head['Known Pd 2']] != '':
+                    tmp[i[0]][i[head['Locus']]]['Known Pd 2'] = (float(i[head['Known Pd 2']].split(';')[0]), float(i[head['Known Pd 2']].split(';')[1]))
             if 'Known Pd 3' in head:
-                tmp[i[0]][i[head['Locus']]]['Known Pd 3'] = (float(i[head['Known Pd 3']].split(';')[0]), float(i[head['Known Pd 3']].split(';')[1]))
+                if i[head['Known Pd 3']] != '':
+                    tmp[i[0]][i[head['Locus']]]['Known Pd 3'] = (float(i[head['Known Pd 3']].split(';')[0]), float(i[head['Known Pd 3']].split(';')[1]))
     
     for case in tmp:
         for locus in LOCUS:
