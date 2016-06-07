@@ -120,9 +120,9 @@ class Report:
             found_b = False
             for j in range(0, len(self.replicates)):
                 for k in range(0, len(self.replicates[j])):
-                    if self.knowns_pd[i].a == self.replicates[j][k]:
+                    if self.knowns_pd[i].a.length == self.replicates[j][k]:
                         found_a = True
-                    if self.knowns_pd[i].b == self.replicates[j][k]:
+                    if self.knowns_pd[i].b.length == self.replicates[j][k]:
                         found_b = True
             if found_a and not found_b:
                 self.knowns_pd[i] = person_map[(self.knowns_pd[i].a.length, -1)]
@@ -145,7 +145,7 @@ class Report:
         
         if ID == "PN":
             self.set_drop_out(db, self.constants.CONTRIBUTORS_PN, ID)
-            #pno = open('output/PN_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
+            #pno = open('output/PN_' + self.case_name + '_' + self.locus + '_' + self.constants.RACE + '.csv', 'w') #
             for i in range(0, len(self.population_pn)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pn[i])):
@@ -163,11 +163,11 @@ class Report:
                     #pno.write(',' + str(product) + ',' + str(summation) + '\n') #
                     product = float(1.0)
 
-            #pno.close()
+            #pno.close() #
             return summation
         elif ID == "PD":
             self.set_drop_out(db, self.constants.CONTRIBUTORS_PD, ID)
-            #pdo = open('output/PD_' + self.locus + '_' + self.constants.RACE + '.csv', 'w')
+            #pdo = open('output/PD_' + self.case_name + '_' + self.locus + '_' + self.constants.RACE + '.csv', 'w') #
             for i in range(0, len(self.population_pd)):
                 if self.is_subset_px(i, ID):
                     for j in range(0, len(self.population_pd[i])):
@@ -185,7 +185,7 @@ class Report:
                     #pdo.write(',' + str(product) + ',' + str(summation) + '\n') #
                     product = float(1.0)
             
-            #pdo.close()
+            #pdo.close() #
             return summation
         else:
             print "class Report (generate_px) ID is incorrectly inputted"
@@ -523,5 +523,4 @@ if __name__ == '__main__':
             #o.write(result[key] + ',' + result[key]['BLACK_LR'] + ',' + result[key]['BLACK_PN'] + ',' + result[key]['BLACK_PD'] + ',' + result[key]['CAUCASIAN_LR'] + ',' + result[key]['CAUCASIAN_PN'] + ',' + result[key]['CAUCASIAN_PD'] + ',' + result[key]['HISPANIC_LR'] + ',' + result[key]['HISPANIC_PN'] + ',' + result[key]['HISPANIC_PD'] + ',' + result[key]['ASIAN_LR'] + ',' + result[key]['ASIAN_PN'] + ',' + result[key]['ASIAN_PD'] +'\n')
         o.close()
     '''
-
 #gather()
