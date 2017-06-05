@@ -39,8 +39,9 @@ class Constants:
         self.CONTRIBUTORS_PD = 0
         self.QUANT = 0
         self.DEDUCIBLE = 'ND'
-        self.MINIMUM_WILD_FREQUENCY = 0.0005
+        self.MINIMUM_WILD_FREQUENCY = 0.0005  # Not used
         self.THETA = 0.03
+        self.X = 0.95
 
 def get_drop_out(name):
     tmp = {}
@@ -277,5 +278,3 @@ def get_mixture(name):
             tmp[case][locus]['Unique Alleles'] = unique_list
     
     return tmp
-            
-    

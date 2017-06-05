@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
+import logging, sys
 from genotype_combinations import Allele, Genotypes, Person, THETA
 from get_data import LOCUS, RACE, Constants, get_drop_out, get_drop_in, get_allele_freq, get_mixture
 from multiprocessing import Pool
 
-#result = []
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 class Report:
     def __init__(self, drop_out_db, knowns_pn, unknowns_pn, knowns_pd, unknowns_pd, genotypes, replicates, case_name, locus, constants):
@@ -17,8 +18,6 @@ class Report:
         self.locus = locus
         self.case_name = case_name.replace('/', '-')
         self.constants = constants
-
-        FREQ_CORRECTION = self.constants.MINIMUM_WILD_FREQUENCY
         
         self.indicies_pn = []
         self.indicies_pd = []
@@ -63,7 +62,8 @@ class Report:
         self.pn = self.generate_px(drop_out_db, "PN")
         self.pd = self.generate_px(drop_out_db, "PD")
         self.lr = self.pn / self.pd
-        print self.case_name, self.locus, self.constants.RACE, "LR:", self.lr, "PN:", self.pn, "PD:", self.pd
+        #print self.case_name, self.locus, self.constants.RACE, "LR:", self.lr, "PN:", self.pn, "PD:", self.pd
+        logging.info(',' + self.case_name + ',' + self.locus + ',' + self.constants.RACE + ',' + str(self.lr) + ',' + str(self.pn) + ',' + str(self.pd))
 
     def permute(self, number_items, length, position, depth, perimeter, ID):
         if depth >= length:
@@ -75,7 +75,8 @@ class Report:
             elif ID == "PD":
                 self.indicies_pd.append(index_vector)
             else:
-                print "class Report (Permute) ID is incorrectly inputted"
+                #print "class Report (Permute) ID is incorrectly inputted"
+                logging.info("class Report (Permute) ID is incorrectly inputted")
             return
         for i in range(0, len(number_items)):
             position[depth] = i
@@ -188,7 +189,8 @@ class Report:
             #pdo.close() #
             return summation
         else:
-            print "class Report (generate_px) ID is incorrectly inputted"
+            #print "class Report (generate_px) ID is incorrectly inputted"
+            logging.info("class Report (generate_px) ID is incorrectly inputted")
 
     def is_subset_px(self, i, ID):
         if ID == "PN":
@@ -198,7 +200,8 @@ class Report:
             if self.subset(self.population_pd[i][:len(self.knowns_pd)], self.knowns_pd):
                 return True
         else:
-            print "class Report (is_subset_px) ID is incorrectly inputted"
+            #print "class Report (is_subset_px) ID is incorrectly inputted"
+            logging.info("class Report (is_subset_px) ID is incorrectly inputted")
         return False
 
     def subset(self, persons_1, persons_2):
@@ -229,7 +232,8 @@ class Report:
                 elif (present_first and not present_second) or (not present_first and present_second):
                     return self.constants.PN_PHET1
                 else:
-                    "class Report (drop_out) present conditions not met"
+                    #print "class Report (drop_out) present conditions not met"
+                    logging.info("class Report (drop_out) present conditions not met")
         elif ID == "PD":
             if person.hom:
                 for i in range(0, len(alleles)):
@@ -251,9 +255,11 @@ class Report:
                 elif (present_first and not present_second) or (not present_first and present_second):
                     return self.constants.PD_PHET1
                 else:
-                    "class Report (drop_out) present conditions not met"
+                    #print "class Report (drop_out) present conditions not met"
+                    logging.info("class Report (drop_out) present conditions not met")
         else:
-            print "class Report (drop_out) ID is incorrectly inputted"
+            #print "class Report (drop_out) ID is incorrectly inputted"
+            logging.info("class Report (drop_out) ID is incorrectly inputted")
 
     def drop_in(self, persons, alleles):
         tmp = []
@@ -362,12 +368,13 @@ class Report:
                     self.constants.PD_PHET2 = PHET2
                     self.constants.PD_PHET0 = full - (self.constants.PD_PHET1 + PHET2)
 
-def generate_wild_allele_freq(alleles, minimum):
+def generate_wild_allele_freq(alleles, X):
     c = float(1.0)
+    total = float(0.0)
     for i in range(0, len(alleles)):
         c -= alleles[i].freq
-    if c < 0:
-        return minimum
+        total += alleles[i].freq
+        if total >= X: return None
     return c
 
 def gather(race):
@@ -375,10 +382,7 @@ def gather(race):
     idb = get_drop_in('Drop_In_Rates.csv')
     adb = get_allele_freq('Allele_Frequencies.csv')
     cdb = get_mixture('../case.csv')
-    #with open('../output.csv', 'w') as o:
-        #o.write('Case,Race,LR,PN,PD\n')
-    #with open('log.txt', 'w') as log:
-        #log.write('LOG FILE\n')
+
     for case in cdb:
         
         constants = Constants()
@@ -435,7 +439,10 @@ def gather(race):
         constants.THETA = float(idb['THETA'])
 
         #for race in RACE:
+        constants.X = float(idb['X'])
         constants.RACE = race
+
+        # The following if-block is not used
         if constants.RACE == "BLACK":
             constants.MINIMUM_WILD_FREQUENCY = float(idb['B-MIN-WILD-FREQ'])
         elif constants.RACE == "CAUCASIAN":
@@ -450,12 +457,15 @@ def gather(race):
         Overall_PD = float(1.0)
 
         for locus in LOCUS:
-            #with open('log.txt', 'a') as log:
-                #log.write(case + ' ' + locus + ' ' + race + '\n')
             alleles = []
             for length in cdb[case][locus]['Unique Alleles']:
                 alleles.append(Allele(locus, length, adb[locus][length][race]))
-            alleles.append(Allele("W", -1, generate_wild_allele_freq(alleles, constants.MINIMUM_WILD_FREQUENCY)))
+
+            wild_frequency = generate_wild_allele_freq(alleles, constants.X)
+            if wild_frequency == None:
+                logging.info(',' + case + ',' + locus + ',' + race + ',1.0,1.0,1.0,Threshold')
+                continue
+            alleles.append(Allele("W", -1, wild_frequency))
             
             genotypes = Genotypes(alleles)
             
@@ -498,29 +508,9 @@ def gather(race):
             Overall_LR *= report.lr
             Overall_PN *= report.pn
             Overall_PD *= report.pd
-        print case, race, Overall_LR, Overall_PN, Overall_PD
-        #result.append((case, race, Overall_LR, Overall_PN, Overall_PD))
-        '''
-        result[case][race + '_LR'] = Overall_LR
-        result[case][race + '_PN'] = Overall_PN
-        result[case][race + '_PD'] = Overall_PD
-        '''
-        
-        with open('../output.csv', 'a') as o:
-            o.write(case + ',' + report.constants.RACE + ',' + str(Overall_LR) + ',' + str(Overall_PN) + ',' + str(Overall_PD) + '\n')
+        #print case, race, Overall_LR, Overall_PN, Overall_PD
+        logging.info(',' + case + ',Overall,' + race + ',' + str(Overall_LR) + ',' + str(Overall_PN) + ',' + str(Overall_PD) + ',')
 
 if __name__ == '__main__':
-    with open('../output.csv', 'w') as o:
-        o.write('Case,Race,LR,PN,PD\n')
-    p = Pool(8)
+    p = Pool(4)
     p.map(gather, RACE)
-    '''
-    with open('../output.csv', 'w') as o:
-        o.write('Case,Race,LR,PN,PD\n')
-        #o.write('Case,Black LR,Black PN,Black PD,Caucasian LR,Caucasian PN,Caucasian PD,Hispanic LR,Hispanic PN,Hispanic PD,Asian LR,Asian PN,Asian PD,\n')
-        for i in result:
-            o.write(result[0] + ',' + result[1] + ',' + result[2] + ',' + result[3] + ',' + result[4] + '\n')
-            #o.write(result[key] + ',' + result[key]['BLACK_LR'] + ',' + result[key]['BLACK_PN'] + ',' + result[key]['BLACK_PD'] + ',' + result[key]['CAUCASIAN_LR'] + ',' + result[key]['CAUCASIAN_PN'] + ',' + result[key]['CAUCASIAN_PD'] + ',' + result[key]['HISPANIC_LR'] + ',' + result[key]['HISPANIC_PN'] + ',' + result[key]['HISPANIC_PD'] + ',' + result[key]['ASIAN_LR'] + ',' + result[key]['ASIAN_PN'] + ',' + result[key]['ASIAN_PD'] +'\n')
-        o.close()
-    '''
-#gather()
