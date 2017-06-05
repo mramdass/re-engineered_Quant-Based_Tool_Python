@@ -97,10 +97,10 @@ John Butler,D5,D,60,12;13,2,3,11;13,11;13,10;11;12;13;14
 John Butler,FGA,D,60,21;22,2,3,19;21;22;23;24;25;26,19;21;22;23;25,19;21;22;23;25;26
 ```
 
-To Run, double click on reQBT_Python.py or via command line:
+To Run, double click on run.bat (Windows) or via command line:
 
 ```
-python reQBT_Python.py
+python reQBT.py
 ```
 
 Notes:
